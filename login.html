@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Basic favicon -->
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+
+<!-- PNG favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16.png">
+
+<!-- Apple (iPhone/iPad) -->
+<link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
+
+<!-- Android / Chrome -->
+<link rel="icon" type="image/png" sizes="192x192" href="static/android-chrome-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="static/android-chrome-512x512.png">
+
+<!-- Optional: Web manifest -->
+<link rel="manifest" href="static/site.webmanifest">
+  <title>AVAN — Access Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #030508;
+      --surface:   #080d14;
+      --border:    #0f2a3f;
+      --accent:    #ffa600;
+      --accent2:   #ff3e3e;
+      --green:     #00ff88;
+      --text:      #c8dde8;
+      --dim:       #97a7b0;
+      --mono:      'Share Tech Mono', monospace;
+      --sans:      'Rajdhani', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text); font-family: var(--sans);
+      min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; overflow: hidden; position: relative;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,166,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,166,0,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridMove 20s linear infinite; pointer-events: none;
+    }
+    @keyframes gridMove { 0%{transform:translateY(0)} 100%{transform:translateY(40px)} }
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);
+      pointer-events: none; z-index: 100;
+    }
+    .corner { position: fixed; width: 70px; height: 70px; border-color: var(--accent); border-style: solid; opacity: 0.3; }
+    .corner.tl { top:20px; left:20px; border-width:2px 0 0 2px; }
+    .corner.tr { top:20px; right:20px; border-width:2px 2px 0 0; }
+    .corner.bl { bottom:20px; left:20px; border-width:0 0 2px 2px; }
+    .corner.br { bottom:20px; right:20px; border-width:0 2px 2px 0; }
+
+    .back-link {
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      font-family: var(--mono); font-size: 10px; letter-spacing: 3px;
+      color: var(--dim); text-decoration: none; display: flex;
+      align-items: center; gap: 8px; transition: color 0.2s; z-index: 10;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .card {
+      position: relative; z-index: 10; width: 440px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 40px 40px 44px;
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+      animation: cardIn 0.6s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes cardIn {
+      from{opacity:0;transform:translateY(28px) scale(0.97)}
+      to  {opacity:1;transform:translateY(0) scale(1)}
+    }
+    .card::before {
+      content: ''; position: absolute; top:0; left:0; right:0; height:2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+    @keyframes glowPulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+    .brand {
+      font-family: var(--mono); font-size: 24px; letter-spacing: 6px;
+      color: var(--accent); text-align: center; margin-bottom: 4px;
+      text-shadow: 0 0 20px rgba(255,166,0,0.4);
+    }
+    .subtitle {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 3px;
+      color: var(--dim); text-align: center; margin-bottom: 32px;
+    }
+
+    /* TABS */
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); margin-bottom: 28px; }
+    .tab-btn {
+      padding: 10px; background: transparent; border: none;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 3px;
+      color: var(--dim); cursor: pointer; text-transform: uppercase;
+      transition: all 0.2s; position: relative;
+    }
+    .tab-btn.active { color: var(--accent); background: rgba(255,166,0,0.05); }
+    .tab-btn.active::after {
+      content: ''; position: absolute; bottom:0; left:0; right:0;
+      height: 2px; background: var(--accent);
+    }
+    .tab-btn:not(.active):hover { color: var(--text); }
+
+    /* PANELS */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* FIELDS */
+    .field { margin-bottom: 18px; }
+    label {
+      display: block; font-family: var(--mono); font-size: 9px;
+      letter-spacing: 3px; color: var(--dim); margin-bottom: 8px; text-transform: uppercase;
+    }
+    input {
+      width: 100%; background: rgba(255,166,0,0.02); border: 1px solid var(--border);
+      border-bottom: 1px solid var(--dim); color: var(--accent); font-family: var(--mono);
+      font-size: 14px; padding: 11px 14px; outline: none; transition: all 0.2s; letter-spacing: 1px;
+    }
+    input:focus {
+      border-color: var(--accent); background: rgba(255,166,0,0.05);
+      box-shadow: 0 0 14px rgba(255,166,0,0.08);
+    }
+    input::placeholder { color: var(--dim); opacity: 0.45; }
+
+    /* Strength bar */
+    .strength-wrap { margin-top: 8px; display: none; }
+    .strength-wrap.show { display: block; }
+    .strength-bar { height: 2px; background: var(--border); overflow: hidden; }
+    .strength-fill { height: 100%; width: 0%; transition: width 0.3s, background 0.3s; }
+    .strength-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; margin-top: 5px; color: var(--dim); }
+
+    /* Match indicator */
+    .match-indicator { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; margin-top: 6px; display: none; }
+    .match-indicator.show { display: block; }
+    .match-indicator.ok  { color: var(--green); }
+    .match-indicator.err { color: var(--accent2); }
+
+    /* Messages */
+    .msg {
+      font-family: var(--mono); font-size: 11px; padding: 10px 14px;
+      margin-bottom: 18px; letter-spacing: 1px; animation: shake 0.4s ease;
+    }
+    .msg.error { background: rgba(255,62,62,0.07); border: 1px solid rgba(255,62,62,0.25); border-left: 3px solid var(--accent2); color: var(--accent2); }
+    .msg.success { background: rgba(0,255,136,0.06); border: 1px solid rgba(0,255,136,0.25); border-left: 3px solid var(--green); color: var(--green); }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+    /* Button */
+    .btn {
+      width: 100%; padding: 13px; background: transparent; border: 1px solid var(--accent);
+      color: var(--accent); font-family: var(--mono); font-size: 11px; letter-spacing: 4px;
+      cursor: pointer; margin-top: 6px; position: relative; overflow: hidden;
+      transition: all 0.3s; text-transform: uppercase;
+    }
+    .btn::before {
+      content: ''; position: absolute; inset: 0; background: var(--accent);
+      transform: translateX(-100%); transition: transform 0.3s ease; z-index: -1;
+    }
+    .btn:hover { color: var(--bg); box-shadow: 0 0 28px rgba(255,166,0,0.35); }
+    .btn:hover::before { transform: translateX(0); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn:disabled:hover { color: var(--accent); box-shadow: none; }
+    .btn:disabled::before { transform: translateX(-100%) !important; }
+
+    .divider {
+      text-align: center; font-family: var(--mono); font-size: 9px;
+      letter-spacing: 2px; color: var(--dim); margin: 16px 0 0; opacity: 0.5;
+    }
+
+    .status-bar {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      font-family: var(--mono); font-size: 9px; color: var(--dim); letter-spacing: 2px;
+      display: flex; gap: 24px; opacity: 0.4; white-space: nowrap;
+    }
+    .status-bar span::before { content: '▸ '; }
+  </style>
+</head>
+<body>
+
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <a href="/" class="back-link">← BACK TO HOME</a>
+
+  <div class="card">
+    <div class="brand">AVAN</div>
+    <div class="subtitle">AI VISION ALERT NETWORK</div>
+
+    <div class="tabs">
+      <button class="tab-btn {% if show_register %}{% else %}active{% endif %}" id="tab-login"    onclick="switchTab('login')">LOGIN</button>
+      <button class="tab-btn {% if show_register %}active{% endif %}"           id="tab-register" onclick="switchTab('register')">REGISTER</button>
+    </div>
+
+    <!-- LOGIN PANEL -->
+    <div class="panel {% if show_register %}{% else %}active{% endif %}" id="panel-login">
+      {% if login_error %}
+      <div class="msg error">⚠ {{ login_error }}</div>
+      {% endif %}
+      {% if register_success %}
+      <div class="msg success">✓ Account created! You can now log in.</div>
+      {% endif %}
+
+      <form method="POST" action="/login">
+        <div class="field">
+          <label>Operator ID</label>
+          <input type="text" name="username" placeholder="Enter your username" autocomplete="off" required>
+        </div>
+        <div class="field">
+          <label>Access Code</label>
+          <input type="password" name="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn">AUTHENTICATE</button>
+      </form>
+      <div class="divider">NEW HERE? CLICK REGISTER ABOVE</div>
+    </div>
+
+    <!-- REGISTER PANEL -->
+    <div class="panel {% if show_register %}active{% endif %}" id="panel-register">
+      {% if register_error %}
+      <div class="msg error">⚠ {{ register_error }}</div>
+      {% endif %}
+
+      <form method="POST" action="/register">
+        <div class="field">
+          <label>Operator ID (Username)</label>
+          <input type="text" name="username" placeholder="Choose a username (min 3 chars)"
+                 minlength="3" autocomplete="off" required
+                 value="{{ reg_username or '' }}">
+        </div>
+        <div class="field">
+          <label>Create Password</label>
+          <input type="password" name="password" id="reg-password"
+                 placeholder="Min. 6 characters" minlength="6"
+                 oninput="checkStrength(this.value)" required>
+          <div class="strength-wrap" id="strength-wrap">
+            <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+            <div class="strength-label" id="strength-label"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Confirm Password</label>
+          <input type="password" name="confirm_password" id="reg-confirm"
+                 placeholder="Re-enter your password"
+                 oninput="checkMatch()" required>
+          <div class="match-indicator" id="match-ind"></div>
+        </div>
+        <button type="submit" class="btn" id="reg-btn">CREATE ACCOUNT</button>
+      </form>
+      <div class="divider">ALREADY HAVE AN ACCOUNT? CLICK LOGIN</div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <span>ENCRYPT: BCRYPT</span>
+    <span>CAM: STANDBY</span>
+    <span>AI: READY</span>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+      document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    }
+
+    function checkStrength(val) {
+      const wrap  = document.getElementById('strength-wrap');
+      const fill  = document.getElementById('strength-fill');
+      const label = document.getElementById('strength-label');
+      if (!val) { wrap.classList.remove('show'); return; }
+      wrap.classList.add('show');
+      let score = 0;
+      if (val.length >= 6)  score++;
+      if (val.length >= 10) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const levels = [
+        {w:'20%',  bg:'#ff3e3e', txt:'WEAK'},
+        {w:'40%',  bg:'#ff8c00', txt:'FAIR'},
+        {w:'60%',  bg:'#ffd93d', txt:'MODERATE'},
+        {w:'80%',  bg:'#88ff00', txt:'STRONG'},
+        {w:'100%', bg:'#00ff88', txt:'EXCELLENT'},
+      ];
+      const lvl = levels[Math.min(score - 1, 4)] || levels[0];
+      fill.style.width = lvl.w;
+      fill.style.background = lvl.bg;
+      label.textContent = lvl.txt;
+      label.style.color = lvl.bg;
+    }
+
+    function checkMatch() {
+      const pw   = document.getElementById('reg-password').value;
+      const conf = document.getElementById('reg-confirm').value;
+      const ind  = document.getElementById('match-ind');
+      const btn  = document.getElementById('reg-btn');
+      if (!conf) { ind.classList.remove('show'); return; }
+      ind.classList.add('show');
+      if (pw === conf) {
+        ind.textContent = '✓ PASSWORDS MATCH';
+        ind.className = 'match-indicator show ok';
+        btn.disabled = false;
+      } else {
+        ind.textContent = '✗ PASSWORDS DO NOT MATCH';
+        ind.className = 'match-indicator show err';
+        btn.disabled = true;
+      }
+    }
+  </script>
+</body>
+</html>

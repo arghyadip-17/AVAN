@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Basic favicon -->
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+
+<!-- PNG favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16.png">
+
+<!-- Apple (iPhone/iPad) -->
+<link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
+
+<!-- Android / Chrome -->
+<link rel="icon" type="image/png" sizes="192x192" href="static/android-chrome-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="static/android-chrome-512x512.png">
+
+<!-- Optional: Web manifest -->
+<link rel="manifest" href="static/site.webmanifest">
+  <title>AVAN — AI Vision Alert Network</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #02040a;
+      --surface:  #060c15;
+      --border:   #0c2030;
+      --accent:   #ffa600;
+      --cyan:     #00d4ff;
+      --red:      #ff3e3e;
+      --green:    #00ff88;
+      --text:     #b8cfd8;
+      --dim:      #acb4b9;
+      --mono:     'Share Tech Mono', monospace;
+      --display:  'Bebas Neue', sans-serif;
+      --sans:     'Rajdhani', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow-x: hidden;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+
+    /* ── SCANLINES OVERLAY ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ═══════════════════════════════
+       NAVBAR
+    ═══════════════════════════════ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 48px;
+      height: 60px;
+      background: rgba(2,4,10,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 18px;
+      letter-spacing: 6px;
+      color: var(--accent);
+      text-shadow: 0 0 16px rgba(255,166,0,0.4);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      margin-left: auto;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--dim);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    .nav-cta {
+      margin-left: 32px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      border: 1px solid rgba(255,166,0,0.5);
+      padding: 7px 18px;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: all 0.25s;
+    }
+    .nav-cta:hover {
+      background: var(--accent);
+      color: var(--bg);
+      box-shadow: 0 0 24px rgba(255,166,0,0.4);
+    }
+
+    /* ═══════════════════════════════
+       HERO
+    ═══════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 24px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated grid */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,166,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,166,0,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridDrift 25s linear infinite;
+    }
+    @keyframes gridDrift {
+      0%   { transform: translateY(0); }
+      100% { transform: translateY(60px); }
+    }
+
+    /* Radial glow center */
+    .hero-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,166,0,0.07) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* Corner brackets */
+    .hero-corner {
+      position: absolute;
+      width: 50px; height: 50px;
+      border-color: var(--accent);
+      border-style: solid;
+      opacity: 0.25;
+    }
+    .hero-corner.tl { top: 80px; left: 40px;  border-width: 2px 0 0 2px; }
+    .hero-corner.tr { top: 80px; right: 40px; border-width: 2px 2px 0 0; }
+    .hero-corner.bl { bottom: 40px; left: 40px;  border-width: 0 0 2px 2px; }
+    .hero-corner.br { bottom: 40px; right: 40px; border-width: 0 2px 2px 0; }
+
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: var(--accent);
+      border: 1px solid rgba(255,166,0,0.3);
+      padding: 5px 16px;
+      display: inline-block;
+      margin-bottom: 28px;
+      position: relative;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-tag::before, .hero-tag::after {
+      content: '';
+      position: absolute;
+      top: 50%; 
+      width: 30px; height: 1px;
+      background: rgba(255,166,0,0.3);
+    }
+    .hero-tag::before { right: calc(100% + 10px); }
+    .hero-tag::after  { left:  calc(100% + 10px); }
+
+    .hero-title {
+      font-family: var(--display);
+      font-size: clamp(72px, 12vw, 160px);
+      line-height: 0.9;
+      letter-spacing: 8px;
+      color: #fff;
+      position: relative;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero-title span {
+      color: var(--accent);
+      text-shadow: 0 0 40px rgba(255,166,0,0.5);
+    }
+
+    .hero-sub {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--dim);
+      margin-top: 12px;
+      margin-bottom: 40px;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-desc {
+      max-width: 540px;
+      font-size: 17px;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--text);
+      margin-bottom: 48px;
+      opacity: 0.8;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+
+    .btn-primary {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--bg);
+      background: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 16px 40px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%) skewX(-15deg);
+      transition: transform 0.4s ease;
+    }
+    .btn-primary:hover { box-shadow: 0 0 40px rgba(255,166,0,0.5); }
+
+    .btn-outline {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 16px 40px;
+      transition: all 0.3s;
+    }
+    .btn-outline:hover {
+      border-color: var(--dim);
+      color: #fff;
+    }
+
+    /* ═══════════════════════════════
+       HOW IT WORKS
+    ═══════════════════════════════ */
+    .section {
+      padding: 100px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 5px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: clamp(40px, 6vw, 72px);
+      letter-spacing: 4px;
+      color: #fff;
+      margin-bottom: 16px;
+      line-height: 1;
+    }
+
+    .section-desc {
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--dim);
+      max-width: 500px;
+      line-height: 1.7;
+      margin-bottom: 64px;
+    }
+
+    /* Steps */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .step {
+      background: var(--surface);
+      padding: 36px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .step:hover { background: #0a1520; }
+
+    .step::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .step:hover::before { transform: scaleX(1); }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      opacity: 0.5;
+      margin-bottom: 20px;
+    }
+
+    .step-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .step-title {
+      font-family: var(--sans);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--dim);
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════
+       FEATURES
+    ═══════════════════════════════ */
+    .features-section {
+      padding: 100px 48px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .features-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 64px;
+    }
+
+    .feature-card {
+      border: 1px solid var(--border);
+      padding: 32px;
+      position: relative;
+      transition: all 0.3s;
+      background: var(--bg);
+    }
+
+    .feature-card:hover {
+      border-color: rgba(255,166,0,0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover::after { opacity: 0.5; }
+
+    .feat-icon {
+      width: 48px; height: 48px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .feat-icon::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: -1px;
+      width: 12px; height: 12px;
+      border-top: 2px solid var(--accent);
+      border-left: 2px solid var(--accent);
+    }
+
+    .feat-title {
+      font-family: var(--sans);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .feat-desc {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--dim);
+      line-height: 1.65;
+    }
+
+    .feat-badge {
+      display: inline-block;
+      margin-top: 14px;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      border: 1px solid rgba(255,166,0,0.2);
+      padding: 3px 8px;
+      text-transform: uppercase;
+    }
+
+    /* ═══════════════════════════════
+       STATS BAR
+    ═══════════════════════════════ */
+    .stats-bar {
+      padding: 60px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .stat-item {
+      background: var(--bg);
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-family: var(--display);
+      font-size: 52px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      display: block;
+      line-height: 1;
+      text-shadow: 0 0 30px rgba(255,166,0,0.3);
+    }
+
+    .stat-unit {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--accent);
+    }
+
+    .stat-lbl {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--dim);
+      margin-top: 8px;
+      text-transform: uppercase;
+    }
+
+    /* ═══════════════════════════════
+       CTA SECTION
+    ═══════════════════════════════ */
+    .cta-section {
+      padding: 120px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(255,166,0,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-title {
+      font-family: var(--display);
+      font-size: clamp(40px, 7vw, 88px);
+      letter-spacing: 4px;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .cta-title span { color: var(--accent); }
+
+    .cta-desc {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--dim);
+      margin-bottom: 48px;
+    }
+
+    /* ═══════════════════════════════
+       FOOTER
+    ═══════════════════════════════ */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: var(--mono);
+      font-size: 14px;
+      letter-spacing: 5px;
+      color: var(--accent);
+      opacity: 0.5;
+    }
+
+    .footer-text {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--dim);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .section, .features-section, .cta-section { padding: 60px 20px; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); padding: 40px 20px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <div class="nav-logo">AVAN</div>
+  <ul class="nav-links">
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+  </ul>
+  <a href="/login" class="nav-cta">LAUNCH APP</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero" id="home">
+  <div class="hero-glow"></div>
+  <div class="hero-corner tl"></div>
+  <div class="hero-corner tr"></div>
+  <div class="hero-corner bl"></div>
+  <div class="hero-corner br"></div>
+
+  <div class="hero-tag">AI-POWERED SURVEILLANCE</div>
+
+  <h1 class="hero-title">
+    <span>AI</span> VISION<br>ALERT<br>NETWORK
+  </h1>
+
+  <div class="hero-sub">INTELLIGENT OBJECT DETECTION &amp; MONITORING</div>
+
+  <p class="hero-desc">
+    Real-time surveillance powered by YOLOv8. Automatically detects object changes,
+    saves snapshots, and logs every event — so you never miss a moment.
+  </p>
+
+  <div class="hero-btns">
+    <a href="/login" class="btn-primary">▶ GET STARTED</a>
+    <a href="#how-it-works" class="btn-outline">SEE HOW IT WORKS</a>
+  </div>
+
+  
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="section" id="how-it-works">
+  <div class="reveal">
+    <div class="section-tag">▸ Process</div>
+    <h2 class="section-title">HOW IT<br>WORKS</h2>
+    <p class="section-desc">From login to live detection in seconds. AVAN runs a continuous AI loop on your camera feed.</p>
+  </div>
+
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num">STEP 01</div>
+      <span class="step-icon">🔐</span>
+      <div class="step-title">Create Account</div>
+      <div class="step-desc">Register with a unique operator ID and secure password. Login anytime to access your surveillance dashboard.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 02</div>
+      <span class="step-icon">🎥</span>
+      <div class="step-title">Start Recording</div>
+      <div class="step-desc">Click Start Recording. AVAN instantly connects to your webcam and begins the AI detection pipeline.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 03</div>
+      <span class="step-icon">🤖</span>
+      <div class="step-title">AI Monitors</div>
+      <div class="step-desc">YOLOv8 runs frame-by-frame, identifying every object in the scene with high accuracy in real time.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 04</div>
+      <span class="step-icon">📸</span>
+      <div class="step-title">Auto Snapshot</div>
+      <div class="step-desc">The moment a new object appears or disappears, a snapshot is saved automatically with a timestamp.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 05</div>
+      <span class="step-icon">📋</span>
+      <div class="step-title">Event Log</div>
+      <div class="step-desc">All events are stored in the database. Review your full history with thumbnails anytime on the dashboard.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<div style="padding: 0 48px; max-width:1296px; margin:0 auto;">
+  <div class="stats-bar reveal">
+    <div class="stat-item">
+      <span class="stat-val">80<span class="stat-unit">+</span></span>
+      <div class="stat-lbl">Object Classes</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-val">30<span class="stat-unit">fps</span></span>
+      <div class="stat-lbl">Detection Speed</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-val">0<span class="stat-unit">ms</span></span>
+      <div class="stat-lbl">Manual Effort</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-val">24<span class="stat-unit">/7</span></span>
+      <div class="stat-lbl">Continuous Watch</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEATURES ── -->
+<section class="features-section" id="features">
+  <div class="features-inner">
+    <div class="reveal">
+      <div class="section-tag">▸ Capabilities</div>
+      <h2 class="section-title">CORE<br>FEATURES</h2>
+      <p class="section-desc">Everything you need for intelligent, automated visual monitoring.</p>
+    </div>
+
+    <div class="features-grid">
+      
+      <div class="feature-card reveal" style="transition-delay:0.1s">
+        <div class="feat-icon">📷</div>
+        <div class="feat-title">Auto Snapshots</div>
+        <div class="feat-desc">Automatically captures and saves a snapshot image every time the scene changes — no manual intervention needed.</div>
+        <span class="feat-badge">AUTO-SAVE</span>
+      </div>
+     
+      <div class="feature-card reveal" style="transition-delay:0s">
+        <div class="feat-icon">🔐</div>
+        <div class="feat-title">Secure Login</div>
+        <div class="feat-desc">Hashed passwords via Werkzeug security. Register once, login anytime. Session-based access control on all routes.</div>
+        <span class="feat-badge">ENCRYPTED</span>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.1s">
+        <div class="feat-icon">📡</div>
+        <div class="feat-title">Live Stream</div>
+        <div class="feat-desc">Watch the annotated MJPEG video stream directly in your browser with bounding boxes drawn in real time.</div>
+        <span class="feat-badge">MJPEG STREAM</span>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.2s">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-title">Instant Alerts</div>
+        <div class="feat-desc">Live dashboard updates every 1.5 seconds showing currently detected objects and total event count without page reload.</div>
+        <span class="feat-badge">POLLING API</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="cta-section">
+  <h2 class="cta-title reveal">READY TO<br><span>MONITOR</span>?</h2>
+  <p class="cta-desc reveal">CREATE YOUR FREE OPERATOR ACCOUNT IN SECONDS</p>
+  <div class="reveal">
+    <a href="/login" class="btn-primary" style="font-size:13px; padding:18px 56px; letter-spacing:5px;">
+      ▶ LAUNCH AVAN
+    </a>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">AVAN</div>
+  <div class="footer-text">© AI VISION ALERT NETWORK &nbsp;·&nbsp; BUILT BY ARGHYADIP GHOSH</div>
+  <div class="footer-text">v2.0</div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
