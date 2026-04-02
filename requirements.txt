@@ -1,6 +1,7 @@
-flask>=2.3.0
-flask-login>=0.6.2
-opencv-python>=4.8.0
-ultralytics>=8.0.0
-werkzeug>=2.3.0
-pillow>=10.0.0
+flask
+flask-login
+opencv-python
+ultralytics
+werkzeug
+pillow
+gunicorn
