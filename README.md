@@ -3,6 +3,8 @@
 AVAN is a **real-time AI-powered surveillance system** that detects and tracks objects using computer vision.
 It leverages **YOLOv8**, **Flask**, and **live camera feeds (mobile/laptop)** to monitor environments and log events automatically.
 
+DEMO : https://avan.onrender.com
+
 ---
 
 ## 🧠 Features
