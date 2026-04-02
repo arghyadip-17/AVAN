@@ -36,7 +36,6 @@ app.secret_key = os.getenv("SECRET_KEY", "avan_secret_key_change_in_prod")
 
 BASE_DIR = Path(__file__).parent
 LOGS_DIR = BASE_DIR / "static" / "logs"
-MODEL_PATH = BASE_DIR / "model" / "yolov8n.pt"
 DB_PATH = BASE_DIR / "database.db"
 
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -75,13 +74,15 @@ init_db()
 # ──────────────────────────────────────────────
 # YOLO MODEL (lazy-load)
 # ──────────────────────────────────────────────
-yolo_model = None
+# remove this
+# MODEL_PATH = BASE_DIR / "model" / "yolov8n.pt"
 
+yolo_model = None
 
 def get_model():
     global yolo_model
     if yolo_model is None:
-        yolo_model = YOLO(str(MODEL_PATH))
+        yolo_model = YOLO("yolov8n.pt")  # auto-downloads correct model
     return yolo_model
 
 
